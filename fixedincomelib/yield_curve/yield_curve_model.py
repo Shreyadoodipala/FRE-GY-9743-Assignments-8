@@ -154,8 +154,9 @@ class YieldCurve(Model):
                 engine.calculate_value()
                 # TODO 3: Append this instrument's par-rate gradient as one
                 # Jacobian row, flattening blocks in model component order.
-                raise NotImplementedError("TODO 3: construct a calibration Jacobian row")
-            jacobian_pre[index] = grads  # np.concatenate(grads, axis=0)
+                par_grad = engine.grad_at_par()
+                grads.append(np.concatenate(par_grad, axis=0).reshape(1, -1))
+            jacobian_pre[index] = np.concatenate(grads, axis=0)
 
         self.model_jacobian_ = (
             block_diag(*jacobian_pre) if only_state_data else np.concatenate(jacobian_pre, axis=0)
